@@ -445,8 +445,8 @@ details.acc[open] summary::after{content:"\2212"}
     <header class="site-head">
       <a class="brand" data-go="home" href="#home"><span class="brand-mark">⚡</span><span><h1>Work Unit Tracker</h1><small>GloBird · Agent Tools</small></span></a>
       <nav class="tabs" id="tabs" role="tablist" aria-label="Pages">
-        <button type="button" class="tab" role="tab" aria-selected="false" data-view="home"><span class="tab-ic">🏠 </span>Home</button>
-        <button type="button" class="tab" role="tab" aria-selected="false" data-view="tracker"><span class="tab-ic">🎮 </span>Tracker</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-view="home"><span class="tab-ic">🗓️ </span>Home</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-view="hour"><span class="tab-ic">🎮 </span>Hour by hour</button>
         <button type="button" class="tab" role="tab" aria-selected="false" data-view="stats"><span class="tab-ic">📈 </span>Stats</button>
         <button type="button" class="tab" role="tab" aria-selected="false" data-view="guide"><span class="tab-ic">📖 </span>Guide</button>
       </nav>
@@ -454,95 +454,46 @@ details.acc[open] summary::after{content:"\2212"}
     </header>
 
     <div id="homeView" class="view" hidden>
-      <section class="card enter hero">
-        <div class="hero-copy">
-          <span class="eyebrow">For GloBird sales agents</span>
-          <h2 class="hero-h">Hit 55 work units a day. <span>Know it hour by hour.</span></h2>
-          <p class="hero-p">Tap each call as you take it, chase 7.3 WU an hour, and let a slightly gassy mascot keep you honest. Your average, catch-up target and monthly stats update as you go.</p>
-          <div class="btn-row">
-            <button type="button" class="btn btn-primary" data-go="tracker">🎮 Open the tracker</button>
-            <button type="button" class="btn btn-outline" data-go="guide">How it works</button>
-          </div>
-          <p class="hint" style="margin:0">Free · private to your browser · works offline</p>
-        </div>
-        <div class="snap" id="homeSnap"></div>
-      </section>
-
-      <section class="card enter">
-        <h2 class="sec-h">How it works</h2>
-        <div class="steps">
-          <div class="step"><span class="step-n">1</span><b>Tap calls as they happen</b><p>One tap per call, sale or sign-up. Each adds its work units to the current hour.</p></div>
-          <div class="step"><span class="step-n">2</span><b>Fill the hour ring</b><p><span class="js-perhour">7.3</span> WU an hour keeps you on track for <span class="js-goal">55</span> a day. Green ring means that hour's done.</p></div>
-          <div class="step"><span class="step-n">3</span><b>Finish the day</b><p>Hit "Finish &amp; log today" and your average, streak and stats update. Forgot? It logs itself next morning.</p></div>
-        </div>
-      </section>
-
-      <section class="card enter">
-        <h2 class="sec-h">What each call is worth</h2>
-        <div class="rate-grid" id="homeRates"></div>
-        <p class="hint" style="margin:0">Freshdesk work units aren't tracked here — they're a bonus on top.</p>
-      </section>
-
-      <section class="card enter">
-        <h2 class="sec-h">Everything in the box</h2>
-        <div class="feat-grid">
-          <div class="feat" data-go="tracker"><span class="f-em">🎮</span><b>Hour-by-hour game</b><p>Levels, badges, combos and sound effects for every call you log.</p></div>
-          <div class="feat" data-go="guide" data-scroll="g-mascot"><span class="f-em">💨</span><b>A mascot with opinions</b><p>Laughs when you're ahead, cries when you're behind, and has something to say about every call.</p></div>
-          <div class="feat" data-go="guide" data-scroll="g-short"><span class="f-em">⚖️</span><b>Fair averages</b><p>Short days and Saturdays get a smaller goal. Sick and annual leave never count against you.</p></div>
-          <div class="feat" data-go="tracker" data-scroll="catchupCard"><span class="f-em">🎯</span><b>Catch-up maths</b><p>Exactly how many WU your next day needs — and the easiest way to get there.</p></div>
-          <div class="feat" data-go="stats"><span class="f-em">📈</span><b>Stats that keep everything</b><p>Every month, best weekday, best hour, call mix, records and badges.</p></div>
-          <div class="feat" data-go="guide" data-scroll="g-data"><span class="f-em">💾</span><b>Your data, portable</b><p>One CSV moves everything to a new version or a new computer.</p></div>
-        </div>
-      </section>
-
-      <section class="card enter">
-        <h2 class="sec-h">A day with the tracker</h2>
-        <ol class="timeline">
-          <li><span class="tl-ic">🌅</span><div><b>Start of shift</b><span>Open the tracker. If you tracked yesterday but didn't log it, it's already done for you.</span></div></li>
-          <li><span class="tl-ic">📞</span><div><b>Every call</b><span>Tap it. Watch the ring fill toward <span class="js-perhour">7.3</span> WU.</span></div></li>
-          <li><span class="tl-ic">⏰</span><div><b>Top of each hour</b><span>Fresh ring. The mascot tells you how the last hour went.</span></div></li>
-          <li><span class="tl-ic">🏁</span><div><b>End of shift</b><span>Finish &amp; log today. Check the catch-up card if you're under.</span></div></li>
-          <li><span class="tl-ic">💾</span><div><b>Once a week</b><span>Stats → Download CSV, so your history is safe.</span></div></li>
-        </ol>
-      </section>
-
-      <section class="card enter cta">
-        <h2>Ready to hit <span class="js-goal">55</span>?</h2>
-        <p>Takes ten seconds to start. Your first tap unlocks your first badge.</p>
-        <button type="button" class="btn" data-go="tracker">🎮 Open the tracker</button>
-      </section>
-    </div>
-
-    <div id="trackerView" class="view" hidden>
-    <!-- HOUR BY HOUR (game) -->
-    <div class="card enter game-card" id="gameCard">
+    <!-- QUICK ADD -->
+    <div class="card enter">
       <div class="card-head">
-        <h2 class="card-title"><span class="em">🎮</span> Hour by hour</h2>
-        <div class="btn-row" style="gap:8px">
-          <span class="lvl-pill" id="lvlPill">Lv 1</span>
-          <button type="button" class="icon-btn sm" id="sfxToggle" aria-label="Sound effects" title="Sound effects">🔊</button>
-          <button type="button" class="icon-btn sm" id="voiceToggle" aria-label="Mascot voice" title="Mascot voice off">🗣️</button>
+        <h2 class="card-title"><span class="em">🗓️</span> Add yesterday's work units</h2>
+      </div>
+      <div id="pendingWrap" style="display:none">
+        <label>Pending days (click to fill)</label>
+        <div class="chip-row" id="pendingChips"></div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="qaDate">Date</label>
+          <input type="date" id="qaDate">
+          <span class="hint" id="qaDateNote" style="margin-top:6px"></span>
+          <span class="error-msg" id="qaDateErr">Pick Monday–Saturday, not in the future.</span>
         </div>
       </div>
-      <div class="xp-wrap"><div class="xp"><span id="xpBar"></span></div><span class="xp-t" id="xpText"></span></div>
-      <div class="hour-chips" id="hourChips"></div>
-      <div class="game-main">
-        <div class="ring-wrap">
-          <svg viewBox="0 0 132 132" class="ring" aria-hidden="true"><circle cx="66" cy="66" r="52" class="ring-bg"></circle><circle cx="66" cy="66" r="52" id="ringMain" class="ring-fg" stroke-dasharray="0 999" transform="rotate(-90 66 66)"></circle><circle cx="66" cy="66" r="52" id="ringBonus" class="ring-bonus" stroke-dasharray="0 999" transform="rotate(-90 66 66)"></circle></svg>
-          <div class="ring-txt" aria-live="polite"><b id="ringNum">0</b><span id="ringSub">of 7.3 WU</span><small id="ringHour"></small></div>
+      <div class="field">
+        <label>Day type</label>
+        <div class="type-grid" id="qaTypeGrid">
+          <button type="button" class="type-btn active" data-type="worked"><b>💼 Worked</b><span>Enter work units</span></button>
+          <button type="button" class="type-btn" data-type="sick"><b>🤒 Sick leave</b><span>Excluded from average</span></button>
+          <button type="button" class="type-btn" data-type="annual"><b>🌴 Annual leave</b><span>Excluded from average</span></button>
         </div>
-        <div class="call-grid" id="callGrid"></div>
       </div>
-      <div class="game-foot" id="gameFoot"></div>
-      <div class="hour-strip" id="hourStrip"></div>
+      <div class="field" id="qaHoursWrap">
+        <label for="qaHours">Hours worked</label>
+        <input type="number" id="qaHours" step="0.25" min="0" placeholder="e.g. 7.5">
+        <span class="hint" id="qaHoursHint" style="margin-top:6px"></span>
+        <span class="error-msg" id="qaHoursErr">Enter the hours you worked (0 or more).</span>
+      </div>
+      <div class="field" id="qaUnitsWrap">
+        <label for="qaUnits">Total work units <span class="hint" style="font-family:var(--body);font-weight:600">— from the daily tracker</span></label>
+        <input type="number" id="qaUnits" step="0.1" min="0" placeholder="e.g. 61.5">
+        <span class="error-msg" id="qaUnitsErr">Enter a work unit total of 0 or more.</span>
+      </div>
       <div class="btn-row">
-        <button type="button" class="btn btn-outline" id="undoBtn">↶ Undo</button>
-        <button type="button" class="btn btn-primary" id="finishDayBtn">🏁 Finish &amp; log today</button>
+        <button class="btn btn-primary" id="qaSaveBtn">Save entry</button>
+        <button class="btn btn-ghost" id="qaCancelBtn" style="display:none">Cancel edit</button>
       </div>
-      <details class="acc">
-        <summary>Ways to hit the hourly pace</summary>
-        <div class="acc-body" id="hourlyCard" style="display:flex;flex-direction:column;gap:14px;padding-top:12px"></div>
-      </details>
     </div>
 
     <!-- STATS -->
@@ -582,61 +533,6 @@ details.acc[open] summary::after{content:"\2212"}
       </div>
     </div>
 
-    <!-- QUICK ADD -->
-    <div class="card enter">
-      <div class="card-head">
-        <h2 class="card-title"><span class="em">🗓️</span> Log a business day</h2>
-      </div>
-      <div id="pendingWrap" style="display:none">
-        <label>Pending days (click to fill)</label>
-        <div class="chip-row" id="pendingChips"></div>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="qaDate">Date</label>
-          <input type="date" id="qaDate">
-          <span class="error-msg" id="qaDateErr">Pick Monday–Saturday, not in the future.</span>
-        </div>
-      </div>
-      <div class="field">
-        <label>Day type</label>
-        <div class="type-grid" id="qaTypeGrid">
-          <button type="button" class="type-btn active" data-type="worked"><b>💼 Worked</b><span>Enter work units</span></button>
-          <button type="button" class="type-btn" data-type="sick"><b>🤒 Sick leave</b><span>Excluded from average</span></button>
-          <button type="button" class="type-btn" data-type="annual"><b>🌴 Annual leave</b><span>Excluded from average</span></button>
-        </div>
-      </div>
-      <div class="field" id="qaHoursWrap">
-        <label for="qaHours">Hours worked</label>
-        <input type="number" id="qaHours" step="0.25" min="0" placeholder="e.g. 7.5">
-        <span class="hint" id="qaHoursHint" style="margin-top:6px"></span>
-        <span class="error-msg" id="qaHoursErr">Enter the hours you worked (0 or more).</span>
-      </div>
-      <div class="field" id="qaUnitsWrap">
-        <label for="qaUnits">Total work units</label>
-        <input type="number" id="qaUnits" step="0.1" min="0" placeholder="e.g. 61.5">
-        <span class="error-msg" id="qaUnitsErr">Enter a work unit total of 0 or more.</span>
-      </div>
-      <details class="acc">
-        <summary>Build it up from calls instead</summary>
-        <div class="acc-body">
-          <p class="hint" style="margin-top:10px">Tick off today's calls and we'll total the work units for you — then tap "Use this total" to drop it straight into the field above.</p>
-          <div class="plan-list" id="buildList"></div>
-          <div class="plan-total">
-            <span>Total</span>
-            <span class="n" id="buildTotal">0.0</span>
-          </div>
-          <div class="btn-row" style="margin-top:8px">
-            <button class="btn btn-primary" id="useBuildBtn" type="button">Use this total ↑</button>
-          </div>
-        </div>
-      </details>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="qaSaveBtn">Save entry</button>
-        <button class="btn btn-ghost" id="qaCancelBtn" style="display:none">Cancel edit</button>
-      </div>
-    </div>
-
     <!-- CATCH UP -->
     <div class="card enter" id="catchupCard">
       <!-- rendered by JS -->
@@ -660,6 +556,40 @@ details.acc[open] summary::after{content:"\2212"}
           <tbody id="historyBody"></tbody>
         </table>
       </div>
+    </div>
+
+    </div>
+
+    <div id="hourView" class="view" hidden>
+    <!-- HOUR BY HOUR (game) -->
+    <div class="card enter game-card" id="gameCard">
+      <div class="card-head">
+        <h2 class="card-title"><span class="em">🎮</span> Hour by hour</h2>
+        <div class="btn-row" style="gap:8px">
+          <span class="lvl-pill" id="lvlPill">Lv 1</span>
+          <button type="button" class="icon-btn sm" id="sfxToggle" aria-label="Sound effects" title="Sound effects">🔊</button>
+          <button type="button" class="icon-btn sm" id="voiceToggle" aria-label="Mascot voice" title="Mascot voice off">🗣️</button>
+        </div>
+      </div>
+      <div class="xp-wrap"><div class="xp"><span id="xpBar"></span></div><span class="xp-t" id="xpText"></span></div>
+      <div class="hour-chips" id="hourChips"></div>
+      <div class="game-main">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 132 132" class="ring" aria-hidden="true"><circle cx="66" cy="66" r="52" class="ring-bg"></circle><circle cx="66" cy="66" r="52" id="ringMain" class="ring-fg" stroke-dasharray="0 999" transform="rotate(-90 66 66)"></circle><circle cx="66" cy="66" r="52" id="ringBonus" class="ring-bonus" stroke-dasharray="0 999" transform="rotate(-90 66 66)"></circle></svg>
+          <div class="ring-txt" aria-live="polite"><b id="ringNum">0</b><span id="ringSub">of 7.3 WU</span><small id="ringHour"></small></div>
+        </div>
+        <div class="call-grid" id="callGrid"></div>
+      </div>
+      <div class="game-foot" id="gameFoot"></div>
+      <div class="hour-strip" id="hourStrip"></div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-outline" id="undoBtn">↶ Undo</button>
+        <button type="button" class="btn btn-primary" id="finishDayBtn">🏁 Finish &amp; log today</button>
+      </div>
+      <details class="acc">
+        <summary>Ways to hit the hourly pace</summary>
+        <div class="acc-body" id="hourlyCard" style="display:flex;flex-direction:column;gap:14px;padding-top:12px"></div>
+      </details>
     </div>
 
     </div>
@@ -729,12 +659,17 @@ details.acc[open] summary::after{content:"\2212"}
 
       <section class="card enter guide-sec" id="g-start">
         <h2 class="sec-h">Getting started</h2>
+        <p><b>Every morning (Home):</b></p>
         <ol>
-          <li>Open <b>Tracker</b>. The <b>Hour by hour</b> card is set to the current hour.</li>
-          <li>Each time you finish a call, tap the matching button. Sales and sign-ups have their own buttons.</li>
-          <li>Made a mistake? <b>↶ Undo</b> removes the last tap. Missed an hour? Tap that hour's chip and add the calls there.</li>
-          <li>At the end of your shift, hit <b>🏁 Finish &amp; log today</b>.</li>
-          <li>For a day you didn't tap through (or leave), use <b>Log a business day</b> further down and enter the total.</li>
+          <li>Open the daily tracker IT built and note yesterday's total work units.</li>
+          <li>On <b>Home</b>, the date is already set to the previous business day. Type the total and press <b>Enter</b>.</li>
+          <li>Off sick or on leave? Pick <b>Sick leave</b> or <b>Annual leave</b> instead. Those days don't count against your average.</li>
+        </ol>
+        <p><b>During the day (Hour by hour, optional):</b></p>
+        <ol>
+          <li>Tap a button for each call as you finish it, and watch the ring fill toward the hourly target.</li>
+          <li><b>↶ Undo</b> removes the last tap. Missed an hour? Tap that hour's chip and add the calls there.</li>
+          <li>Hit <b>🏁 Finish &amp; log today</b> at the end of your shift. Next morning, enter the official total on Home and it replaces the tapped one.</li>
         </ol>
       </section>
 
@@ -747,7 +682,7 @@ details.acc[open] summary::after{content:"\2212"}
       <section class="card enter guide-sec" id="g-hour">
         <h2 class="sec-h">The hourly target</h2>
         <div class="formula"><span class="js-goal">55</span> WU ÷ <span class="js-std">7.5</span> hours = <span class="js-perhour">7.3</span> WU an hour</div>
-        <p>Hit that every hour and the day takes care of itself. Realistic ways to get there:</p>
+        <p>Hit that every hour and the day takes care of itself. Track it live on the <b>Hour by hour</b> page. Realistic ways to get there:</p>
         <div id="guidePace" style="display:flex;flex-direction:column;gap:14px"></div>
       </section>
 
@@ -811,6 +746,7 @@ details.acc[open] summary::after{content:"\2212"}
       <section class="card enter guide-sec faq" id="g-faq">
         <h2 class="sec-h">FAQ</h2>
         <details><summary>I tapped calls but my average didn't change</summary><p>Today's taps count once the day is finished — hit "Finish &amp; log today", or it happens automatically next morning. That way your average doesn't drop at 9am every day.</p></details>
+        <details><summary>My taps and the daily tracker total don't match. Which counts?</summary><p>The daily tracker. Enter its total on Home and it replaces whatever Hour by hour logged for that day. The taps stay in your Stats for best hours and call mix.</p></details>
         <details><summary>Can my manager or anyone else see my numbers?</summary><p>No. Everything is stored in your own browser on your own device. Nothing is sent anywhere unless you share the CSV yourself.</p></details>
         <details><summary>What happens if I clear my browser data?</summary><p>Your history is wiped from that browser. Upload your latest CSV to get it back — another reason to download one weekly.</p></details>
         <details><summary>I logged a day manually and also tapped calls. Which wins?</summary><p>A manual entry is kept unless you choose otherwise — "Finish &amp; log today" asks before replacing it.</p></details>
@@ -1163,10 +1099,22 @@ function prefillHoursForDate(iso){
 }
 document.getElementById("qaDate").addEventListener("change", function(){
   prefillHoursForDate(this.value);
+  updateQaDateNote();
 });
 function selectQuickAddDate(iso){
   setQuickAddDate(iso);
   prefillHoursForDate(iso);
+  updateQaDateNote();
+}
+function updateQaDateNote(){
+  var iso = document.getElementById("qaDate").value, el = document.getElementById("qaDateNote");
+  if(!el) return;
+  if(!iso){ el.textContent = ""; return; }
+  var e = state.entries[iso], prev = isoLocal(prevBusinessDay(todayLocal()));
+  var lead = iso === prev ? "Previous business day: " + dayLabel(iso) + ". " : "";
+  if(e && editingISO !== iso){
+    el.textContent = lead + "Already logged: " + (e.type === "worked" ? e.units + " WU" + (e.source === "hourly" ? " (from Hour by hour)" : "") : e.type + " leave") + " — saving replaces it.";
+  } else el.textContent = lead;
 }
 function initQuickAddDefault(){
   var pending = pendingDays();
@@ -1302,45 +1250,6 @@ function deleteEntry(iso){
   renderAll();
 }
 
-/* ================= Build-from-calls (inside quick add) ================= */
-var buildCounts = {};
-RATES.forEach(function(r){ buildCounts[r.id] = 0; });
-
-function renderBuildList(){
-  var list = document.getElementById("buildList");
-  list.innerHTML = RATES.map(function(r){
-    return '<div class="plan-row">' +
-      '<div class="plan-label"><b>' + r.emoji + ' ' + r.label + '</b><span>' + r.sub + ' · ' + r.value + ' WU each</span></div>' +
-      '<div class="stepper" data-rate="' + r.id + '" data-target="build">' +
-        '<button type="button" data-act="dec">−</button>' +
-        '<input type="number" min="0" step="1" value="0" readonly>' +
-        '<button type="button" data-act="inc">+</button>' +
-      '</div>' +
-    '</div>';
-  }).join("");
-  updateBuildTotal();
-}
-function updateBuildTotal(){
-  var total = RATES.reduce(function(s,r){ return s + buildCounts[r.id]*r.value; }, 0);
-  document.getElementById("buildTotal").textContent = round1(total);
-  return round1(total);
-}
-document.getElementById("buildList").addEventListener("click", function(e){
-  var btn = e.target.closest("button[data-act]");
-  if(!btn) return;
-  var stepper = btn.closest(".stepper");
-  var rateId = stepper.getAttribute("data-rate");
-  var delta = btn.getAttribute("data-act")==="inc" ? 1 : -1;
-  buildCounts[rateId] = Math.max(0, buildCounts[rateId] + delta);
-  stepper.querySelector("input").value = buildCounts[rateId];
-  updateBuildTotal();
-});
-document.getElementById("useBuildBtn").addEventListener("click", function(){
-  var total = updateBuildTotal();
-  setQaType("worked");
-  document.getElementById("qaUnits").value = total;
-  toast("Dropped " + total + " WU into the field above");
-});
 
 /* ================= Hourly pace card (static outline, no interaction) ================= */
 function rateVal(id){
@@ -2714,7 +2623,7 @@ function backupReminder(){
 }
 
 /* ================= Site shell: pages, home snapshot, guide ================= */
-var VIEWS = ["home","tracker","stats","guide"];
+var VIEWS = ["home","hour","stats","guide"];
 function fillDynamicText(){
   var set = function(cls, v){ Array.prototype.forEach.call(document.querySelectorAll(cls), function(el){ el.textContent = v; }); };
   set(".js-goal", state.goal); set(".js-perhour", round1(perHourTarget())); set(".js-std", standardHours()); set(".js-sat", state.saturdayHours);
@@ -2724,23 +2633,7 @@ function rateCards(){
     return '<div class="rate' + (BIG_CALLS[r.id] ? ' big' : '') + '"><span class="r-em">' + r.emoji + '</span><b>' + r.label + '</b><small>' + r.sub + '</small><span class="r-v">' + r.value + ' WU</span></div>';
   }).join("");
 }
-function renderHome(){
-  var v = document.getElementById("homeView"); if(!v || v.hidden) return;
-  document.getElementById("homeRates").innerHTML = rateCards();
-  var today = gameToday(), stats = computeStats("all"), li = levelInfo(lifetimeWU()), t = perHourTarget();
-  var hourWU = countsWU(hourlyFor(today)[pad(new Date().getHours())]), dayWU = hourlyDayWU(today);
-  var has = Object.keys(state.entries).length || Object.keys(state.hourly || {}).length;
-  var tile = function(l, val, sub, good){ return '<div class="stat"><span class="stat-label">' + l + '</span><span class="stat-value' + (good ? ' good' : '') + '">' + val + '</span><span class="stat-sub">' + sub + '</span></div>'; };
-  var html = '<div class="snap-h"><span>' + (has ? 'Your snapshot' : 'Your snapshot (empty)') + '</span><span class="lvl-pill">Lv ' + li.level + ' · ' + li.rank + '</span></div>';
-  html += '<div class="snap-grid">' +
-    tile("Avg / day", stats.avg === null ? "—" : stats.avg, "goal " + state.goal, stats.avg !== null && stats.avg >= state.goal) +
-    tile("This hour", hourWU, "of " + round1(t) + " WU", hourWU >= t) +
-    tile("Today", dayWU, "WU tapped so far", dayWU >= state.goal) +
-    tile("Goal streak", computeStreak(), "days in a row") + '</div>';
-  html += '<div class="xp-wrap" style="margin:0"><div class="xp"><span style="width:' + Math.min(100, li.into/li.need*100) + '%"></span></div><span class="xp-t">' + Math.round(li.into) + ' / ' + li.need + ' XP</span></div>';
-  html += has ? '' : '<p class="hint" style="margin:0">Tap your first call on the Tracker and your numbers appear here.</p>';
-  document.getElementById("homeSnap").innerHTML = html;
-}
+function renderHome(){ /* home is the daily log; rendered by renderAll */ }
 function renderGuide(){
   var v = document.getElementById("guideView"); if(!v || v.hidden) return;
   document.getElementById("guideRates").innerHTML = RATES.map(function(r){ return '<tr><td>' + r.emoji + ' ' + r.label + ' <span class="hint">(' + r.sub + ')</span></td><td><b>' + r.value + '</b></td></tr>'; }).join("");
@@ -2751,11 +2644,12 @@ function renderGuide(){
   }).join("");
 }
 function showView(v, scrollTo){
+  if(v === "tracker") v = "home";             // old links
   if(VIEWS.indexOf(v) < 0) v = "home";
   VIEWS.forEach(function(id){ document.getElementById(id + "View").hidden = id !== v; });
   Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(b){ var on = b.getAttribute("data-view") === v; b.classList.toggle("active", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
   fillDynamicText();
-  if(v === "home") renderHome(); else if(v === "stats") renderStatsPage(); else if(v === "guide") renderGuide(); else renderGame();
+  if(v === "stats") renderStatsPage(); else if(v === "guide") renderGuide(); else if(v === "hour") renderGame();
   try{ history.replaceState(null, "", "#" + v); }catch(e){}
   if(scrollTo){
     setTimeout(function(){ var el = document.getElementById(scrollTo); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60);
@@ -2788,7 +2682,6 @@ function renderAll(){
 setQaType("worked");
 initQuickAddDefault();
 document.getElementById("qaDate").max = isoLocal(todayLocal());
-renderBuildList();
 buildCallGrid();
 var firstRun = state.seenBadges === undefined;
 finalizePastHourly(true);
@@ -2796,9 +2689,8 @@ renderAll();
 checkNewBadges(firstRun);
 setInterval(gameClockTick, 20000);
 backupReminder();
-var startView = location.hash.replace("#", "");
-if(VIEWS.indexOf(startView) < 0) startView = (Object.keys(state.entries).length || Object.keys(state.hourly || {}).length) ? "tracker" : "home";
-showView(startView);
+showView(location.hash.replace("#", "") || "home");
+if(!document.getElementById("homeView").hidden) setTimeout(function(){ document.getElementById("qaUnits").focus({preventScroll:true}); }, 50);
 
 })();
 </script>
