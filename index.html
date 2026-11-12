@@ -150,6 +150,8 @@ input.bad{border-color:var(--pink-deep);background:#fff5fa}
 .trend-bar-miss{fill:var(--pink)}
 .trend-goal-tick{stroke:var(--ink);stroke-width:2;opacity:.5}
 .trend-label{font-family:var(--body);font-size:9.5px;fill:var(--muted)}
+.trend-val{font-family:var(--body);font-size:10.5px;font-weight:800;fill:var(--ink,#2a1a24);paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}
+.trend-hrs-short{fill:var(--pink-deep);font-weight:800}
 
 /* ---------- outline buttons ---------- */
 .btn-outline{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
@@ -858,12 +860,12 @@ function computeStats(period){
   var avg = weightedCount ? round1(sum/weightedCount) : null;
   var sick = dates.filter(function(iso){ return state.entries[iso].type==="sick"; }).length;
   var annual = dates.filter(function(iso){ return state.entries[iso].type==="annual"; }).length;
-  return {sum: round1(sum), count: count, weightedCount: round1(weightedCount), partialCount: partialCount, avg: avg, sick: sick, annual: annual};
+  return {sum: round1(sum), count: count, weightedCount: weightedCount, partialCount: partialCount, avg: avg, sick: sick, annual: annual};
 }
 function computeCatchup(stats){
   if(stats.count === 0) return {status:"empty"};
   var goal = state.goal;
-  if(stats.avg >= goal){
+  if(stats.sum - goal*stats.weightedCount >= -0.05){
     return {status:"ahead", surplus: round1(stats.sum - goal*stats.weightedCount)};
   }
   return {status:"behind", needed: round1(goal*(stats.weightedCount+1) - stats.sum)};
@@ -1341,7 +1343,7 @@ function renderTrend(){
     maxVal = (maxVal * 1.15) || 1;
 
     var n = recent.length;
-    var W = 700, H = 170, padL = 4, padR = 4, padB = 22, padT = 8;
+    var W = 700, H = 200, padL = 4, padR = 4, padB = 36, padT = 18;
     var innerW = W - padL - padR, innerH = H - padT - padB;
     var gap = 8;
     var barW = Math.max(4, (innerW - gap*(n-1)) / n);
@@ -1352,6 +1354,7 @@ function renderTrend(){
       var partial = Math.abs(entryWeight(e, iso) - 1) > 0.001;
       var hit = e.units >= entryGoal(e, iso);
       var barH = Math.max(2, (fd/maxVal)*innerH);
+      if(hit) barH = Math.max(barH, (goal/maxVal)*innerH);   // on-target days always reach the line
       var x = padL + i*(barW+gap);
       var y = padT + (innerH - barH);
       var goalY = padT + innerH - Math.min(innerH, (goal/maxVal)*innerH);
@@ -1360,13 +1363,14 @@ function renderTrend(){
       var tip = dayLabel(iso) + ": " + e.units + " WU in " + entryHours(e, iso) + "h" + (partial ? " = " + fd + " full-day pace" : "") + " (goal " + entryGoal(e, iso) + ")";
       bars +=
         '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="4" class="' + (hit?"trend-bar-hit":"trend-bar-miss") + '"><title>' + tip + '</title></rect>' +
-        (partial ? '<text x="' + (x+barW/2) + '" y="' + (y+13) + '" text-anchor="middle" class="trend-label" style="fill:#fff;font-weight:700">' + entryHours(e, iso) + 'h</text>' : '') +
         '<line x1="' + x + '" y1="' + goalY + '" x2="' + (x+barW) + '" y2="' + goalY + '" class="trend-goal-tick"></line>' +
-        '<text x="' + (x+barW/2) + '" y="' + (H-6) + '" text-anchor="middle" class="trend-label">' + lbl + '</text>';
+        '<text x="' + (x+barW/2) + '" y="' + (y-5) + '" text-anchor="middle" class="trend-val">' + e.units + '</text>' +
+        '<text x="' + (x+barW/2) + '" y="' + (H-20) + '" text-anchor="middle" class="trend-label">' + lbl + '</text>' +
+        '<text x="' + (x+barW/2) + '" y="' + (H-6) + '" text-anchor="middle" class="trend-label' + (partial ? ' trend-hrs-short' : '') + '">' + entryHours(e, iso) + 'h</text>';
     });
     chartHtml =
       '<svg viewBox="0 0 ' + W + ' ' + H + '" class="trend-svg" role="img" aria-label="Work units over recent days">' + bars + '</svg>' +
-      '<p class="hint" style="margin:6px 0 0">Bar height = full-day pace (short days scaled up to ' + standardHours() + 'h, marked with their hours) &middot; line = goal ' + state.goal + ' &middot; green means on target.</p>';
+      '<p class="hint" style="margin:6px 0 0">Number on top = work units logged &middot; under the date = hours worked (pink = short day) &middot; bar height = full-day pace (units &divide; hours &times; ' + standardHours() + ') &middot; line = goal ' + state.goal + ' &middot; green = on target. Hover a bar for details.</p>';
   }
 
   card.innerHTML =
