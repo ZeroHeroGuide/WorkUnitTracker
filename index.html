@@ -1338,7 +1338,7 @@ function renderTrend(){
     var maxVal = 0;
     recent.forEach(function(iso){
       var e = state.entries[iso];
-      maxVal = Math.max(maxVal, entryFullDay(e, iso), state.goal);
+      maxVal = Math.max(maxVal, e.units, entryGoal(e, iso));
     });
     maxVal = (maxVal * 1.15) || 1;
 
@@ -1350,10 +1350,10 @@ function renderTrend(){
     var bars = "";
     recent.forEach(function(iso, i){
       var e = state.entries[iso];
-      var goal = state.goal, fd = entryFullDay(e, iso);
+      var goal = entryGoal(e, iso), fd = entryFullDay(e, iso);
       var partial = Math.abs(entryWeight(e, iso) - 1) > 0.001;
       var hit = e.units >= entryGoal(e, iso);
-      var barH = Math.max(2, (fd/maxVal)*innerH);
+      var barH = Math.max(2, (e.units/maxVal)*innerH);
       if(hit) barH = Math.max(barH, (goal/maxVal)*innerH);   // on-target days always reach the line
       var x = padL + i*(barW+gap);
       var y = padT + (innerH - barH);
@@ -1370,7 +1370,7 @@ function renderTrend(){
     });
     chartHtml =
       '<svg viewBox="0 0 ' + W + ' ' + H + '" class="trend-svg" role="img" aria-label="Work units over recent days">' + bars + '</svg>' +
-      '<p class="hint" style="margin:6px 0 0">Number on top = work units logged &middot; under the date = hours worked (pink = short day) &middot; bar height = full-day pace (units &divide; hours &times; ' + standardHours() + ') &middot; line = goal ' + state.goal + ' &middot; green = on target. Hover a bar for details.</p>';
+      '<p class="hint" style="margin:6px 0 0">Number on top = work units logged &middot; under the date = hours worked (pink = short day) &middot; line = that day\'s goal (hours &times; ' + Math.round(perHourTarget()*100)/100 + ' WU, e.g. ' + standardHours() + 'h = ' + state.goal + ') &middot; green = on target. Hover a bar for details.</p>';
   }
 
   card.innerHTML =
