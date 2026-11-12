@@ -584,6 +584,7 @@ details.acc[open] summary::after{content:"\2212"}
       <div class="hour-strip" id="hourStrip"></div>
       <div class="btn-row">
         <button type="button" class="btn btn-outline" id="undoBtn">↶ Undo</button>
+        <button type="button" class="btn btn-outline" id="clearHourBtn">🗑️ Clear hour</button>
         <button type="button" class="btn btn-primary" id="finishDayBtn">🏁 Finish &amp; log today</button>
       </div>
       <details class="acc">
@@ -1202,7 +1203,7 @@ document.getElementById("qaSaveBtn").addEventListener("click", function(){
   if(qaType === "worked"){
     var dg = entryGoal(state.entries[dateVal], dateVal);
     setTimeout(function(){ mascotSay(dayLogPhrase(units, dg)); }, 250);
-    if(units >= dg){ sfxFanfare(); setTimeout(mascotStartDance, 1600); } else { sfxCoin(.2); }
+    if(units >= dg){ sfxJackpot(true); setTimeout(mascotStartDance, 3700); } else { sfxCoin(.2); }
   } else {
     setTimeout(function(){ mascotSay(mPick(PHRASES.leave[qaType])); }, 250);
   }
@@ -1874,7 +1875,6 @@ var DAY_START = 8, DAY_END = 17;          // default hour chips: 8am … 5pm sta
 var RANKS = [[1,"Rookie Dialler"],[3,"Phone Jockey"],[5,"Call Wrangler"],[8,"Quote Machine"],[12,"Zero Hero"],[16,"Sales Wizard"],[20,"Legend of the Line"],[30,"Grand Gasbag"]];
 var BIG_CALLS = {zerohero:1, quote:1, elec:1, gas:1};
 var gameHour = new Date().getHours();
-var gameUndo = [];
 var gameCombo = {n:0, last:0};
 var gameTapCount = 0;
 var gameDay = isoLocal(todayLocal());
@@ -2035,6 +2035,38 @@ function tone(freq, at, dur, type, vol, slideTo){
 }
 function sfxCoin(p){ var f = 880 * (1 + Math.min(1.2, p || 0) * .5); tone(f, 0, .07, "square", .05); tone(f*1.5, .065, .16, "square", .05); }
 function sfxChime(){ [1047,1319,1568,2093].forEach(function(f, i){ tone(f, i*.075, .3, "triangle", .09); }); }
+/* pokies-style payout: big = daily goal jackpot, small = hourly target win */
+function jackpotSchedule(ctx, dest, t0, big){
+  var master = ctx.createGain(); master.gain.value = big ? 2.7 : 4; master.connect(dest);
+  function note(f, at, dur, type, vol){
+    var o = ctx.createOscillator(), g = ctx.createGain(), t = t0 + at;
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + .02);
+  }
+  function clink(at, f, vol){ note(f, at, .09, "sine", vol); note(f*2.76, at, .06, "sine", vol*.55); note(f*5.4, at, .035, "sine", vol*.3); }
+  function bell(at, f, vol){ note(f, at, .6, "sine", vol); note(f*2, at, .35, "sine", vol*.4); note(f*3.01, at, .2, "sine", vol*.25); }
+  var arp = [523,659,784,1047,1319,1568,2093], n = big ? arp.length : 5, i;
+  for(i = 0; i < n; i++){ note(arp[i], i*.055, .14, "square", .035); note(arp[i]*2, i*.055, .1, "triangle", .02); }
+  var trillStart = n*.055, trillLen = big ? 1.3 : .45, step = .065;
+  for(i = 0; i*step < trillLen; i++){ var bf = i % 2 ? 1568 : 1319; note(bf, trillStart + i*step, .08, "square", .028); note(bf*2, trillStart + i*step, .06, "sine", .02); }
+  var coins = big ? 70 : 16, span = big ? 2.8 : .9;
+  for(i = 0; i < coins; i++){ var u = i/coins; clink(.15 + span*Math.pow(u, 1.35) + Math.random()*.03, 2600 + Math.random()*2200, .03*(1 - .5*u)); }
+  var end = trillStart + trillLen;
+  if(big){
+    [1047,1319,1568,2093].forEach(function(f, k){ bell(end + k*.09, f, .06); });
+    for(i = 0; i < n; i++) note(arp[i], end + .45 + i*.045, .12, "square", .03);
+    [1047,1319,1568].forEach(function(f){ note(f, end + .8, 1.1, "triangle", .05); note(f*1.005, end + .8, 1.1, "triangle", .03); });
+    return end + 1.95;
+  }
+  [1568,2093].forEach(function(f, k){ bell(end + k*.08, f, .05); });
+  return end + .7;
+}
+function sfxJackpot(big){
+  if(!sfxEnabled()) return;
+  try{ var ctx = sfxCtx(); if(ctx) jackpotSchedule(ctx, ctx.destination, ctx.currentTime + .03, big); }catch(e){}
+}
 function sfxFanfare(){
   [[523,0,.13],[659,.13,.13],[784,.26,.13],[1047,.39,.6]].forEach(function(n){ tone(n[0], n[1], n[2], "square", .05); tone(n[0]/2, n[1], n[2], "triangle", .06); });
   tone(784, .39, .6, "square", .035);
@@ -2181,7 +2213,10 @@ function renderGame(){
   var fin = document.getElementById("finishDayBtn"), logged = state.entries[today];
   fin.disabled = dayWU <= 0;
   fin.textContent = logged && logged.source === "hourly" ? "🏁 Update today's log (" + dayWU + ")" : "🏁 Finish & log today";
-  document.getElementById("undoBtn").disabled = !gameUndo.length;
+  var hasTaps = countsWU(c) > 0 || Object.keys(c).length > 0;
+  document.getElementById("undoBtn").disabled = !hasTaps;
+  document.getElementById("clearHourBtn").disabled = !hasTaps;
+  document.getElementById("clearHourBtn").textContent = "🗑️ Clear " + hourLabel(gameHour);
 }
 function gameFloat(btn, text, big){
   var card = document.getElementById("gameCard"), cr = card.getBoundingClientRect(), br = btn.getBoundingClientRect();
@@ -2211,7 +2246,10 @@ function gameTap(id, btn){
   var c = day[h] || (day[h] = {});
   var before = countsWU(c), dayBefore = hourlyDayWU(today), lvlBefore = levelInfo(lifetimeWU()).level;
   c[id] = (c[id] || 0) + 1;
-  gameUndo.push({iso: today, h: h, id: id}); if(gameUndo.length > 40) gameUndo.shift();
+  if(!state.tapLog) state.tapLog = {};
+  Object.keys(state.tapLog).forEach(function(k){ if(k !== today) delete state.tapLog[k]; });   // undo history is for today only
+  var tl = state.tapLog[today] || (state.tapLog[today] = {});
+  (tl[h] || (tl[h] = [])).push(id);
   var nowMs = Date.now();
   gameCombo.n = (nowMs - gameCombo.last < 6*60*1000) ? gameCombo.n + 1 : 1; gameCombo.last = nowMs;
   gameTapCount++;
@@ -2222,13 +2260,13 @@ function gameTap(id, btn){
 
   var said = false;
   if(dayBefore < state.goal && dayAfter >= state.goal){
-    setTimeout(sfxFanfare, 150); gameConfetti();
+    sfxJackpot(true); gameConfetti(); toast("🎰 JACKPOT! " + dayAfter + " WU today");
     mascotSay(fill(mPick(PHRASES.dayGoal), {wu: dayAfter, goal: state.goal})); said = true;
-    setTimeout(mascotStartDance, 1400);
+    setTimeout(mascotStartDance, 3700);
   } else if(before < target && after >= target){
-    setTimeout(sfxFanfare, 150); gameConfetti();
+    sfxJackpot(false); gameConfetti(); toast("🎰 Hour bonus! " + after + " WU");
     mascotSay(fill(mPick(PHRASES.hourSmashed), {wu: after})); said = true;
-    setTimeout(mascotStartDance, 1400);
+    setTimeout(mascotStartDance, 1500);
   }
   if(li.level > lvlBefore){
     setTimeout(function(){ sfxLevelUp(); toast("⭐ Level " + li.level + " — " + li.rank); }, said ? 1600 : 300);
@@ -2246,18 +2284,45 @@ function gameTap(id, btn){
   renderTrendIfNeeded();
 }
 function renderTrendIfNeeded(){ if(document.getElementById("statsView") && !document.getElementById("statsView").hidden) renderStatsPage(); }
+// Undo takes back the most recent tap in the SELECTED hour (remembered across refreshes)
 function gameUndoLast(){
-  var u = gameUndo.pop(); if(!u) return;
-  var c = state.hourly && state.hourly[u.iso] && state.hourly[u.iso][u.h];
-  if(c && c[u.id] > 0){
-    c[u.id]--; if(c[u.id] === 0) delete c[u.id];
-    if(!Object.keys(c).length) delete state.hourly[u.iso][u.h];
-    saveState(); sfxUndo();
-    var r = RATES.filter(function(x){ return x.id === u.id; })[0];
-    toast("Undid " + r.label.toLowerCase() + " (" + r.sub + ")");
-  }
+  var iso = gameToday(), h = pad(gameHour);
+  var c = state.hourly && state.hourly[iso] && state.hourly[iso][h];
+  if(!c || !Object.keys(c).length){ toast("Nothing to undo in " + hourLabel(gameHour)); return; }
+  var log = (state.tapLog && state.tapLog[iso] && state.tapLog[iso][h]) || [], id = null;
+  while(log.length && !id){ var cand = log.pop(); if(c[cand] > 0) id = cand; }
+  if(!id){ for(var i = RATES.length - 1; i >= 0; i--){ if(c[RATES[i].id] > 0){ id = RATES[i].id; break; } } }
+  if(!id) return;
+  c[id]--; if(c[id] <= 0) delete c[id];
+  if(!Object.keys(c).length) delete state.hourly[iso][h];
+  syncLoggedToday(iso);
+  saveState(); sfxUndo();
+  var r = RATES.filter(function(x){ return x.id === id; })[0];
+  toast("Removed 1 × " + r.label + " (" + r.sub + ") from " + hourLabel(gameHour));
   gameCombo.n = Math.max(0, gameCombo.n - 1);
   renderGame();
+}
+function gameClearHour(){
+  var iso = gameToday(), h = pad(gameHour);
+  var c = state.hourly && state.hourly[iso] && state.hourly[iso][h];
+  if(!c || !Object.keys(c).length) return;
+  if(!confirm("Clear " + hourLabel(gameHour) + "–" + hourLabel(gameHour + 1) + "? This removes all " + countsWU(c) + " WU tapped in that hour.")) return;
+  delete state.hourly[iso][h];
+  if(state.tapLog && state.tapLog[iso]) delete state.tapLog[iso][h];
+  syncLoggedToday(iso);
+  saveState(); sfxUndo();
+  toast("Cleared " + hourLabel(gameHour));
+  gameCombo.n = 0;
+  renderGame();
+}
+// if today was already logged from Hour by hour, keep that logged total in step
+function syncLoggedToday(iso){
+  var e = state.entries[iso];
+  if(e && e.source === "hourly"){
+    var wu = hourlyDayWU(iso);
+    if(wu > 0) e.units = wu; else delete state.entries[iso];
+    renderAll();
+  }
 }
 function gameFinishDay(){
   var today = gameToday(), wu = hourlyDayWU(today); if(wu <= 0) return;
@@ -2271,14 +2336,14 @@ function gameFinishDay(){
   var g = entryGoal(state.entries[today], today);
   toast("Logged today: " + wu + " WU");
   mascotSay(dayLogPhrase(wu, g));
-  if(wu >= g){ sfxFanfare(); gameConfetti(); setTimeout(mascotStartDance, 1500); }
+  if(wu >= g){ sfxJackpot(true); gameConfetti(); toast("🎰 JACKPOT! " + wu + " WU today"); setTimeout(mascotStartDance, 3700); }
   checkNewBadges(false);
   renderAll();
 }
 function gameClockTick(){
   var now = new Date(), today = gameToday();
   if(today !== gameDay){
-    gameDay = today; gameUndo = []; gameHour = now.getHours();
+    gameDay = today; gameHour = now.getHours();
     finalizePastHourly(true); renderAll(); return;
   }
   var h = now.getHours();
@@ -2304,6 +2369,7 @@ document.getElementById("hourStrip").addEventListener("click", function(e){
   gameHour = +b.getAttribute("data-hour"); renderGame();
 });
 document.getElementById("undoBtn").addEventListener("click", gameUndoLast);
+document.getElementById("clearHourBtn").addEventListener("click", gameClearHour);
 document.getElementById("finishDayBtn").addEventListener("click", gameFinishDay);
 document.getElementById("sfxToggle").addEventListener("click", function(){
   if(!state.prefs) state.prefs = {};
