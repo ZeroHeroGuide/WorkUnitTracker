@@ -378,9 +378,9 @@ input.bad{border-color:var(--pink-deep);background:#fff5fa}
 .site-foot{text-align:center;font-size:13px;color:var(--muted);padding:10px 10px 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .site-foot button{appearance:none;border:0;background:none;color:var(--pink-deep);font-weight:700;cursor:pointer;font:inherit;padding:0}
 
-/* ---------- mascot lives on Hour by hour only ---------- */
-body:not(.view-hour) .mascot-wrap{display:none}
-body:not(.view-hour) .wrap{padding-bottom:60px}
+/* ---------- mascot lives on Home only (Hour by hour keeps the pokies sounds) ---------- */
+body:not(.view-home) .mascot-wrap{display:none}
+body:not(.view-home) .wrap{padding-bottom:60px}
 /* ---------- typed date ---------- */
 .date-wrap{position:relative;display:flex;gap:8px}
 .date-wrap input[type="text"]{flex:1}
@@ -1201,6 +1201,11 @@ document.getElementById("qaSaveBtn").addEventListener("click", function(){
   if(wasBehindBefore && nowAhead && qaType==="worked"){
     setTimeout(function(){ toast("🎉 Back on target!"); }, 500);
   }
+  if(qaType === "worked"){
+    window.__wuSaveSaidAt = Date.now();
+    var gSaved = entryGoal(state.entries[dateVal], dateVal);
+    setTimeout(function(){ mascotSay(dayLogPhrase(units, gSaved)); if(units >= gSaved) mascotStartDance(); }, 400);
+  }
   if(isNewBest){
     setTimeout(function(){ toast("🏆 New personal best — " + (newFull !== units ? newFull + " full-day pace!" : units + " WU!")); }, (wasBehindBefore && nowAhead) ? 1000 : 500);
   }
@@ -1566,7 +1571,7 @@ function mascotLoop(){
   }
 }
 var currentView = "home";
-function mascotActive(){ return currentView === "hour"; }
+function mascotActive(){ return currentView === "home"; }
 function mascotStartDance(){
   if(!mascotActive()) return;
   if(mascotTimeline) return;
@@ -1613,7 +1618,7 @@ function renderMascot(){
   if(prev !== mascotState || MASCOT_IDLE[mascotState].indexOf(mascotIdleFrame) < 0){
     mascotIdleFrame = MASCOT_IDLE[mascotState][0];
     if(!mascotTimeline){ mascotShow(mascotIdleFrame, mascotIdleMirror); mascotCloudPose(1,0,0,1); }
-    if(prev !== mascotState) setTimeout(function(){ mascotSay(); }, 600);
+    if(prev !== mascotState) setTimeout(function(){ if(Date.now() - (window.__wuSaveSaidAt || 0) > 2500) mascotSay(); }, 600);
   }
 }
 
@@ -2018,7 +2023,7 @@ function checkNewBadges(silent){
   saveState();
   if(silent) return;
   fresh.forEach(function(b, i){
-    setTimeout(function(){ if(mascotActive()) sfxBadge(); toast(b.em + " Badge unlocked: " + b.name); }, 700 + i*900);
+    setTimeout(function(){ sfxBadge(); toast(b.em + " Badge unlocked: " + b.name); }, 700 + i*900);
   });
   setTimeout(function(){ mascotSay(fill(mPick(PHRASES.badge), {name: fresh[0].name})); }, 1200);
 }
@@ -2745,7 +2750,8 @@ function showView(v, scrollTo){
   if(VIEWS.indexOf(v) < 0) v = "home";
   currentView = v;
   document.body.classList.toggle("view-hour", v === "hour");
-  if(v !== "hour"){
+  document.body.classList.toggle("view-home", v === "home");
+  if(v !== "home"){
     if(typeof voicePlaying !== "undefined" && voicePlaying) voicePlaying.pause();
     if(mascotTimeline){ mascotTimeline = null; mascotWrapEl.classList.remove("dancing"); mascotShow(mascotIdleFrame, mascotIdleMirror); }
     mascotBubbleEl.classList.remove("show");
